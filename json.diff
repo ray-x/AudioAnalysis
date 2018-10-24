@@ -1,0 +1,291 @@
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+index 7bfef59..37a7509 100644
+--- a/.idea/misc.xml
++++ b/.idea/misc.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="1.8" project-jdk-type="JavaSDK">
++  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+     <output url="file://$PROJECT_DIR$/build/classes" />
+   </component>
+   <component name="ProjectType">
+diff --git a/app/src/main/java/com/bowhead/rayxu/audioanalysis/MainActivity.java b/app/src/main/java/com/bowhead/rayxu/audioanalysis/MainActivity.java
+index c29bd2e..22779e5 100644
+--- a/app/src/main/java/com/bowhead/rayxu/audioanalysis/MainActivity.java
++++ b/app/src/main/java/com/bowhead/rayxu/audioanalysis/MainActivity.java
+@@ -31,7 +31,7 @@ import java.io.*;
+ import java.util.concurrent.TimeUnit;
+ 
+ import okhttp3.*;
+-import testjson.testJson;
++
+ 
+ 
+ public class MainActivity extends AppCompatActivity {
+@@ -348,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
+         }catch (Resources.NotFoundException e) {
+             Log.i(TAG, "resource not found");
+         }
+-
++        getCallID();
+ 
+     }
+ 
+@@ -401,6 +401,7 @@ public class MainActivity extends AppCompatActivity {
+ 
+                 // Start recording
+                 .play();
++        getCallID();
+         //file.delete();
+     }
+ 
+@@ -411,7 +412,7 @@ public class MainActivity extends AppCompatActivity {
+         AndroidAudioRecorder.with(this)
+                 // Required
+                 .setFilePath(AUDIO_FILE_PATH)
+-                .setColor(getColor(R.color.recorder_bg))
++                .setColor(getColor(R.color.colorPrimary))
+                 .setRequestCode(REQUEST_RECORD_AUDIO)
+ 
+                 // Optional
+@@ -424,5 +425,6 @@ public class MainActivity extends AppCompatActivity {
+                 .setSessionID(sessionID)
+                 // Start recording
+                 .record();
++        //getCallID();
+     }
+ }
+diff --git a/lib/src/main/java/cafe/adriel/androidaudiorecorder/AudioRecorderActivity.java b/lib/src/main/java/cafe/adriel/androidaudiorecorder/AudioRecorderActivity.java
+index 55f4809..02d0872 100644
+--- a/lib/src/main/java/cafe/adriel/androidaudiorecorder/AudioRecorderActivity.java
++++ b/lib/src/main/java/cafe/adriel/androidaudiorecorder/AudioRecorderActivity.java
+@@ -38,6 +38,7 @@ import cafe.adriel.androidaudiorecorder.model.AudioChannel;
+ import cafe.adriel.androidaudiorecorder.model.AudioSampleRate;
+ import cafe.adriel.androidaudiorecorder.model.AudioSource;
+ 
++import com.google.gson.JsonObject;
+ import okhttp3.*;
+ import okio.BufferedSink;
+ import okio.Okio;
+@@ -197,6 +198,67 @@ public class AudioRecorderActivity extends AppCompatActivity
+         Log.i(TAG, "oncreate");
+     }
+ 
++    public void updateCallID() {
++        OkHttpClient httpClient = new OkHttpClient.Builder()
++                .connectTimeout(10, TimeUnit.SECONDS)
++                .writeTimeout(30, TimeUnit.SECONDS)
++                .readTimeout(300, TimeUnit.SECONDS)
++                .build();
++
++        JsonObject json = new JsonObject();
++        JsonObject jsonType = new JsonObject();
++        jsonType.addProperty("type", "WAV");
++        String jsons = "{'dataFormat':{'type':'WAV'}}";
++        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
++        RequestBody body = RequestBody.create(JSON, jsons);
++
++
++        //token = "vGde6auI6zFkzU1F8G0jxBorsHcTMXSL7prcxZewPtq-rVEb1C7_LsgqS4g6-g7A1EUwMatWmPdiMcuLYpQXeSioWfxrJ9JRHUHaKZkbRCzQMo4fUluCmmwtvV7ZM_tO6BNBKqAZhKyxNPvcSQwxo66uXVv_Xl5vZv-tHoYOzRww8fwXAS7GSQexRQz3zcwVfjOVfj4PL1irXAltz-LuN5dJaZTBs24znqbapnqGp1wGHxIKOC-OtD6VMvqywXsweRfgTqPwfc2CAb6JJ5KF2acUuYuZV0DmMprRJH-PZ97PPO2xElraRtJUhTjwxi1vKxdwQ2pqnJmlTqs3f_-oj8f1jJ4bXwEhNaIS4LeXlyQsI5DC2hENlotwRvSFPVxq_tjigOc-LVQ1OUwdWnXy42p7l5S_oMVLt4K3z-c64JhfVuPGj8xRgV2UQslhHPHr3bLsqtGcDH-QQEpiTJN-GbfV2nHoTCNbsvHvcPInWahaTznpQtjYrQLoYYsXMYuSK-HlFL448N_LpyNnR8zlx2JGmvM8BWDd03oxkFwbDn24T24NGQB7JR6egw9TVlncEh60A7Yk8SxJRYyUW-P6K5JHQWUKnYCU_h-K7S9X5-nKAMewl4Pia_VQUP1BE7ZUTQWvf7wfF-tzfO8Aw4-MKXZBG02EW5PEGzBrvE8d-FYAgU5R9Caf4fI2npjUOgJ5KeR7GkqCA5clOH0yUp-wiv5sRb-nr-djbNaFldD5WfH7D7hg";
++        if (token.isEmpty()) {
++            Log.i(TAG, "no valide token");
++            return;
++        }
++        final String  headers = "";
++
++        request = new Request.Builder().url(startRecording)
++                .addHeader("Authorization", "Bearer " + token)
++                .post(body).build();
++
++
++        httpClient.newCall(request).enqueue(new Callback() {
++            @Override
++            public void onFailure(okhttp3.Call call, IOException e) {
++                Log.i(TAG, e.getMessage());
++            }
++
++            @Override
++            public void onResponse(okhttp3.Call call, Response response) throws IOException {
++
++                String js = response.body().string();
++                int code = response.code();
++
++                Log.i(TAG, String.format("Status code %d %s", code, js));
++                if (code>204){
++                    final String resp =  response.body().string();
++                }
++
++                try {
++                    JSONObject jsonObject = new JSONObject(js);
++                    if (jsonObject.has("recordingId")) {
++                        sessionID = jsonObject.getString("recordingId");
++                        Log.i(TAG, "session id " + sessionID);
++                    }
++                    else {
++                        Log.i(TAG, "invalid token");
++                    }
++
++                    // Do something here
++                } catch (JSONException e) {
++                    Log.i(TAG, e.getMessage());
++                }
++            }
++        });
++    }
+ 
+ 
+     @Override
+@@ -549,6 +611,7 @@ public class AudioRecorderActivity extends AppCompatActivity
+         }
+ 
+         stopTimer();
++        //updateCallID();
+     }
+ 
+     private boolean isPlaying(){
+@@ -610,6 +673,8 @@ public class AudioRecorderActivity extends AppCompatActivity
+             private float offset;
+             private float score;
+             private float duration;
++            private Boolean canStop;
++
+ 
+             public void setDuration(float duration) {
+                 this.duration = duration;
+@@ -635,10 +700,17 @@ public class AudioRecorderActivity extends AppCompatActivity
+                 return score;
+             }
+ 
++            public void setCanStop(Boolean canStop) {
++                this.canStop = canStop;
++            }
++            public Boolean getCanStop() {
++                return canStop;
++            }
+             public Result() {
+                 this.offset = 0;
+-                this.score = 0;
++                this.score = -1;
+                 this.duration = 0;
++                canStop = false;
+             }
+         }
+ 
+@@ -689,23 +761,64 @@ public class AudioRecorderActivity extends AppCompatActivity
+                                     jsonresult.offset = jsonResult.analysisSegments.get(i).offset + jsonResult.analysisSegments.get(i).duration;
+                                     jsonresult.score = Math.max(jsonresult.score, jsonResult.analysisSegments.get(i).getScore());
+                                 }
+-                                final int _anger = Math.round(jsonresult.score);
+-
+-                                AudioRecorderActivity.this.runOnUiThread(new Runnable() {
+-                                    @Override
+-                                    public void run() {
+-                                        if (_anger >10){
+-                                            analysisResult.setText(String.format("Anger: %d ", _anger));
+-                                            if (_anger >= 80)
+-                                                analysisResult.setAllCaps(true);
+-                                            else
+-                                                analysisResult.setAllCaps(false);
+-                                            jsonresult.setScore(1);
++                                if (jsonResult.analysisSegments.size() > 0) {
++                                    final int _anger = Math.round(jsonresult.score);
++                                    //"status":"success","result":{"duration":"140000.00","sessionStatus":"Done","analysisSummary":{"AnalysisResult":{"Anger/Dislike":{"Mode":0,"ModePct":"74.07"}}}}}
++                                    try {
++                                        JSONObject summaryJson = new JSONObject(resp);
++                                        if (summaryJson.has("result")) {
++                                            if (summaryJson.getJSONObject("result").has("analysisSummary")) {
++                                                if (summaryJson.getJSONObject("result").getJSONObject("analysisSummary").has("AnalysisResult")) {
++                                                    JSONObject result = summaryJson.getJSONObject("result").getJSONObject("analysisSummary").getJSONObject("AnalysisResult").getJSONObject("Anger/Dislike");
++                                                    final int finalAnger = Math.round(Float.parseFloat(result.getString("ModePct")));
++                                                    AudioRecorderActivity.this.runOnUiThread(new Runnable() {
++                                                        @Override
++                                                        public void run() {
++                                                            if (finalAnger >= 0) {
++                                                                if (finalAnger >= 80) {
++                                                                    analysisResult.setText(String.format("Summary: Anger value: %d !!", finalAnger));
++                                                                    analysisResult.setTextSize(24);
++                                                                    //analysisResult.setAllCaps(true);
++                                                                } else {
++                                                                    analysisResult.setText(String.format("Summary: emotion value: %d", finalAnger));
++                                                                    analysisResult.setAllCaps(false);
++                                                                }
++                                                                jsonresult.setScore(1);
++                                                            }
++
++                                                        }
++                                                    });
++                                                    jsonresult.setCanStop(true);
++
++
++                                                }
++                                            }
+                                         }
+-
++                                    } catch (Exception e) {
++                                        Log.e(TAG, e.getLocalizedMessage());
+                                     }
+-                                });
+-                                Log.i(TAG, resp);
++
++
++                                    AudioRecorderActivity.this.runOnUiThread(new Runnable() {
++                                        @Override
++                                        public void run() {
++                                            if (_anger >= 0) {
++
++                                                if (_anger >= 80) {
++                                                    analysisResult.setText(String.format("Anger value: %d !!", _anger));
++                                                    analysisResult.setTextSize(24);
++                                                    //analysisResult.setAllCaps(true);
++                                                } else {
++                                                    analysisResult.setText(String.format("emotion value: %d", _anger));
++                                                    analysisResult.setAllCaps(false);
++                                                }
++                                                jsonresult.setScore(1);
++                                            }
++
++                                        }
++                                    });
++                                    Log.i(TAG, resp);
++                                }
+                             }
+                         });
+                     }
+@@ -714,7 +827,8 @@ public class AudioRecorderActivity extends AppCompatActivity
+                     }catch (Exception e) {
+                         Log.e(TAG, e.getLocalizedMessage());
+                     }
+-
++                    if (jsonresult.canStop)
++                        break;
+                 }
+             }
+         };
+diff --git a/lib/src/main/java/com/bowhead/rayxu/audioanalysislib/AnalysisAngerResult.java b/lib/src/main/java/com/bowhead/rayxu/audioanalysislib/AnalysisAngerResult.java
+index 7279b87..1aefc80 100644
+--- a/lib/src/main/java/com/bowhead/rayxu/audioanalysislib/AnalysisAngerResult.java
++++ b/lib/src/main/java/com/bowhead/rayxu/audioanalysislib/AnalysisAngerResult.java
+@@ -61,6 +61,10 @@ public class AnalysisAngerResult {
+     class Score {
+         public float Score;
+         public float Label;
++        public Score (){
++            this.Score = 0;
++            this.Label = 0;
++        }
+         public Score (float score, float label){
+             this.Score = score;
+             this.Label = label;
+diff --git a/lib/src/main/java/com/bowhead/rayxu/audioanalysislib/AnalysisJsonAngerResult.java b/lib/src/main/java/com/bowhead/rayxu/audioanalysislib/AnalysisJsonAngerResult.java
+index f0ed35c..ef2f946 100644
+--- a/lib/src/main/java/com/bowhead/rayxu/audioanalysislib/AnalysisJsonAngerResult.java
++++ b/lib/src/main/java/com/bowhead/rayxu/audioanalysislib/AnalysisJsonAngerResult.java
+@@ -80,7 +80,6 @@ public class AnalysisJsonAngerResult {
+ 
+         }catch (Exception e) {
+             Log.i(TAG, "field not found for analysisSegments...");
+-            return analysisResult;
+         }
+         //Result summary
+ 

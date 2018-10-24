@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
+        tools:context=".MainActivity">
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:text="RECORD AUDIO"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/white"
+            android:onClick="recordAudio"
+            style="@style/Widget.AppCompat.Button.Borderless" android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true" android:layout_marginBottom="73dp"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:text="Sample1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/white"
+            android:onClick="Sample1"
+            style="@style/Widget.AppCompat.Button.Borderless" android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true" android:layout_marginTop="122dp"/>
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="20dp"
+            android:text="Sample2"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/white"
+            android:onClick="Sample2"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_centerHorizontal="true" android:layout_alignParentBottom="true"
+            android:layout_marginBottom="217dp"/>
+    <ProgressBar
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true" android:layout_marginTop="223dp" android:layout_centerHorizontal="true"
+            android:id="@+id/progressBar"/>
+
+
+</RelativeLayout>
